@@ -64,7 +64,7 @@ function checkFriendItem(friendItem) {
     const transferConfirm = className("android.widget.Button").depth(14).text("转账").findOne();
     while (!transferConfirm.click())
         ;
-    sleep(1500);
+    sleep(2000);
     var normalWidget1 = text('选择付款方式').findOnce();
     var normalWidget2 = text('请输入支付密码').findOnce();
     if ((normalWidget1 && normalWidget1.text() === '选择付款方式') || (normalWidget2 && normalWidget2.text() === '请输入支付密码')) {
@@ -195,7 +195,6 @@ function startCheckFriends() {
             if (allFriendsName.indexOf(name) >= 0 || skipCheckNameList.indexOf(name) >= 0) {
                 continue;
             }
-            sleep(1500);
             checkFriendItem(friends[i]);
             sleep(1500);
             allFriendsName.push(name);
