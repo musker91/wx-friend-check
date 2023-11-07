@@ -16,8 +16,12 @@ if (!requestScreenCapture()) {
 //     // 修改控制台位置
 //     console.setPosition(0, 100);
 //     // 修改控制台大小
-//     console.setSize(device.width, device.height / 5);
+//     console.setSize(device.width, device.height / 4);
 // }
+
+var toPassCheckName: string[] = ['微信团队', '微信传输助手'];
+var allFriendsName: string[] = [];
+var processFriendsName: string[] = [];
 
 function startApp() {
     // 启动微信
@@ -180,14 +184,49 @@ function setNote(state: 'del' | 'blacklist') {
     }
 }
 
-function startCheckFriends() {
-    var friends = getOneScreenFriendList();
-    for (var i = 0; i < friends.length; i++) {
-        sleep(1500);
-        checkFriendItem(friends[i]);
-        sleep(1500);
-        break;
+function checkIsEnd() {
+    var end = className('android.widget.TextView').depth(18).findOnce();
+    if (end && end.text().includes('个朋友')) {
+        return true
     }
+    return false
+}
+
+function checkIsTop() {
+    var top = className('android.widget.TextView').depth(21).findOnce();
+    if (top && top.text().includes('新的朋友')) {
+        return true
+    }
+    return false
+}
+
+function startCheckFriends() {
+    while (true) {
+        var friends = getOneScreenFriendList();
+        var firstFriend = friends[0];
+        var lastFriend = friends[friends.length - 1];
+        for (var i = 0; i < friends.length - 1; i++) {
+            var item = friends[i];
+            var name = item.text()
+            if (allFriendsName.indexOf(name) >= 0 || toPassCheckName.indexOf(name) >= 0) {
+                continue;
+            }
+            sleep(1500);
+            checkFriendItem(friends[i]);
+            sleep(1500);
+            allFriendsName.push(name);
+        }
+        if (checkIsEnd()) {
+            break;
+        }
+        swipe(lastFriend.bounds().centerX(), lastFriend.bounds().centerY() * 0.8, firstFriend.bounds().centerX(), 0, 1000);
+    }
+    allFriendsName.forEach((item) => {
+        var s = allFriendsName.filter((i) => i === item);
+        if (s.length > 1) {
+            console.log(item);
+        }
+    })
 }
 
 
@@ -199,7 +238,7 @@ function main() {
     }
     sleep(1000);
     startCheckFriends();
-    hamibot.exit()
+    hamibot.exit();
 }
 
 main();
