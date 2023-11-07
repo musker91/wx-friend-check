@@ -1,8 +1,13 @@
 "use strict";
 // 获取脚本配置
-const { SHOW_CONSOLE, SKIP_CHECK_NAMES } = hamibot.env;
+const { SHOW_CONSOLE, SKIP_CHECK_NAMES, ENABLE_STORAGE, CLEAN_STORAGE } = hamibot.env;
 // 等待开启无障碍权限
 auto.waitFor();
+const DB_NAME = 'wx-checked-friends';
+const CHECK_KEY = 'checked-friends';
+if (CLEAN_STORAGE === 'true') {
+    storages.remove(DB_NAME);
+}
 // 显示控制台
 if (SHOW_CONSOLE === 'true') {
     console.show();
@@ -64,7 +69,7 @@ function checkFriendItem(friendItem) {
     const transferConfirm = className("android.widget.Button").depth(14).text("转账").findOne();
     while (!transferConfirm.click())
         ;
-    sleep(2000);
+    sleep(3000);
     var normalWidget1 = text('选择付款方式').findOnce();
     var normalWidget2 = text('请输入支付密码').findOnce();
     if ((normalWidget1 && normalWidget1.text() === '选择付款方式') || (normalWidget2 && normalWidget2.text() === '请输入支付密码')) {
@@ -198,6 +203,11 @@ function startCheckFriends() {
             checkFriendItem(friends[i]);
             sleep(1500);
             allFriendsName.push(name);
+            processFriendsName.push(name);
+            if (ENABLE_STORAGE === 'true') {
+                var db = storages.create(DB_NAME);
+                db.put(CHECK_KEY, processFriendsName);
+            }
         }
         if (checkIsEnd()) {
             break;
@@ -212,14 +222,22 @@ function startCheckFriends() {
     });
 }
 function parsePassCheckNames() {
-    if (!SKIP_CHECK_NAMES) {
-        return;
+    if (SKIP_CHECK_NAMES) {
+        SKIP_CHECK_NAMES.split('|').forEach((item) => {
+            if (item) {
+                skipCheckNameList.push(item);
+            }
+        });
     }
-    SKIP_CHECK_NAMES.split('|').forEach((item) => {
-        if (item) {
-            skipCheckNameList.push(item);
-        }
-    });
+    if (ENABLE_STORAGE === 'true') {
+        var db = storages.create(DB_NAME);
+        var data = db.get(CHECK_KEY, []);
+        data.forEach((item) => {
+            if (item) {
+                skipCheckNameList.push(item);
+            }
+        });
+    }
 }
 function main() {
     var s = startApp();

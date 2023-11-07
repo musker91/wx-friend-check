@@ -12,5 +12,23 @@
         "name": "SKIP_CHECK_NAMES",
         "type": "text",
         "label": "跳过Check的微信名称/备注名称，多个实用'|'分割"
+    },
+    {
+        "label": "是否先清空本地数据存储",
+        "type": "select",
+        "name": "CLEAN_STORAGE",
+        "options": {
+            "true": "是",
+            "false": "否"
+        }
+    },
+    {
+        "label": "开启数据本地存储",
+        "type": "select",
+        "name": "ENABLE_STORAGE",
+        "options": {
+            "true": "是",
+            "false": "否"
+        }
     }
 ]
