@@ -84,10 +84,6 @@ function checkFriendItem(friendItem) {
         back();
         sleep(1000);
         back();
-        if (normalWidget2 && normalWidget2.text() === '请输入支付密码') {
-            sleep(1000);
-            back();
-        }
         sleep(1000);
         while (!click('通讯录'))
             ;
