@@ -3,11 +3,6 @@
 const { SHOW_CONSOLE, SKIP_CHECK_NAMES } = hamibot.env;
 // 等待开启无障碍权限
 auto.waitFor();
-// 请求截屏权限
-if (!requestScreenCapture()) {
-    toastLog('没有授予 Hamibot 屏幕截图权限');
-    hamibot.exit();
-}
 // 显示控制台
 if (SHOW_CONSOLE === 'true') {
     console.show();
@@ -69,7 +64,7 @@ function checkFriendItem(friendItem) {
     const transferConfirm = className("android.widget.Button").depth(14).text("转账").findOne();
     while (!transferConfirm.click())
         ;
-    sleep(2000);
+    sleep(1500);
     var normalWidget1 = text('选择付款方式').findOnce();
     var normalWidget2 = text('请输入支付密码').findOnce();
     if ((normalWidget1 && normalWidget1.text() === '选择付款方式') || (normalWidget2 && normalWidget2.text() === '请输入支付密码')) {
@@ -90,8 +85,7 @@ function checkFriendItem(friendItem) {
         return;
     }
     // 转账消息
-    const msg = ocr.recognizeText(captureScreen());
-    var fState = parseMsg(msg);
+    var fState = parseMsg();
     console.log(fState === 'del' ? '-> 被删除了' : '-> 被拉黑了');
     if (fState === 'none') {
         return;
@@ -102,8 +96,13 @@ function checkFriendItem(friendItem) {
     sleep(1000);
     setNote(fState);
 }
-function parseMsg(msg) {
+function parseMsg() {
     var state = 'none';
+    var msgWidget = className("android.widget.TextView").depth(9).findOnce();
+    if (!msgWidget) {
+        return state;
+    }
+    const msg = msgWidget.text();
     // 被拉黑了 or 被删除了
     if (msg.includes('好友关系是否正常') || msg.includes('你不是收款方好友')) {
         var isDel = msg.includes('你不是收款方好友');
