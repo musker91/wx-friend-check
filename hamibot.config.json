@@ -1,0 +1,11 @@
+{
+    "fileMark": {
+        "scriptFile": "src/index.js",
+        "configFile": "src/config.json"
+    },
+    "scriptId": "6548612b019e72212c032cfa",
+    "executeRobot": {
+        "_id": "65485f75019e72212c031637",
+        "name": "忠义鸭嘴兽"
+    }
+}
