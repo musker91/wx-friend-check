@@ -1,5 +1,5 @@
 // 获取脚本配置
-const { SHOW_CONSOLE } = hamibot.env;
+const { SHOW_CONSOLE, SKIP_CHECK_NAMES } = hamibot.env;
 
 // 等待开启无障碍权限
 auto.waitFor();
@@ -10,16 +10,16 @@ if (!requestScreenCapture()) {
 }
 
 // 显示控制台
-// if (SHOW_CONSOLE) {
-//     console.show();
-//     sleep(300);
-//     // 修改控制台位置
-//     console.setPosition(0, 100);
-//     // 修改控制台大小
-//     console.setSize(device.width, device.height / 4);
-// }
+if (SHOW_CONSOLE === 'true') {
+    console.show();
+    sleep(300);
+    // 修改控制台位置
+    console.setPosition(0, 100);
+    // 修改控制台大小
+    console.setSize(device.width, device.height / 4);
+}
 
-var toPassCheckName: string[] = ['微信团队', '微信传输助手'];
+var skipCheckNameList: string[] = ['微信团队', '微信传输助手'];
 var allFriendsName: string[] = [];
 var processFriendsName: string[] = [];
 
@@ -204,7 +204,7 @@ function startCheckFriends() {
         for (var i = 0; i < friends.length - 1; i++) {
             var item = friends[i];
             var name = item.text()
-            if (allFriendsName.indexOf(name) >= 0 || toPassCheckName.indexOf(name) >= 0) {
+            if (allFriendsName.indexOf(name) >= 0 || skipCheckNameList.indexOf(name) >= 0) {
                 continue;
             }
             sleep(1500);
@@ -225,6 +225,16 @@ function startCheckFriends() {
     })
 }
 
+function parsePassCheckNames() {
+    if (!SKIP_CHECK_NAMES) {
+        return
+    }
+    (SKIP_CHECK_NAMES as string).split('|').forEach((item) => {
+        if (item) {
+            skipCheckNameList.push(item);
+        }
+    })
+}
 
 function main() {
     var s = startApp();
@@ -232,6 +242,7 @@ function main() {
         hamibot.exit();
         return;
     }
+    parsePassCheckNames();
     sleep(1000);
     startCheckFriends();
     hamibot.exit();
