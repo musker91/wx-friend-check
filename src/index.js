@@ -176,9 +176,12 @@ function setNote(state) {
     }
 }
 function checkIsEnd() {
-    var end = className('android.widget.TextView').depth(18).findOnce();
-    if (end && end.text().includes('个朋友')) {
-        return true;
+    var items = className('android.widget.TextView').depth(18).find();
+    for (let i = 0; i < items.length; i++) {
+        var item = items[i];
+        if (item && item.text().includes('个朋友')) {
+            return true;
+        }
     }
     return false;
 }
