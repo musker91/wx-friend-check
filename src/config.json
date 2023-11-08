@@ -4,8 +4,9 @@
         "type": "select",
         "name": "SHOW_CONSOLE",
         "options": {
-            "true": "是",
-            "false": "否"
+            "false": "否",
+            "true": "是"
+
         }
     },
     {
@@ -18,8 +19,8 @@
         "type": "select",
         "name": "CLEAN_STORAGE",
         "options": {
-            "true": "是",
-            "false": "否"
+            "false": "否",
+            "true": "是"
         }
     },
     {

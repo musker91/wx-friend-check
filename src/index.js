@@ -17,7 +17,7 @@ if (SHOW_CONSOLE === 'true') {
     // 修改控制台大小
     console.setSize(device.width, device.height / 4);
 }
-var skipCheckNameList = ['微信团队', '微信传输助手'];
+var skipCheckNameList = ['微信团队', '文件传输助手'];
 var allFriendsName = [];
 var processFriendsName = [];
 function startApp() {
@@ -40,7 +40,7 @@ function checkFriendItem(friendItem) {
     console.log('check name: ', name);
     // 进入好友详情页
     click(friendItem.bounds().centerX(), friendItem.bounds().centerY());
-    sleep(1000);
+    sleep(1500);
     // 进入聊天消息页面
     while (!click('发消息'))
         ;
@@ -109,8 +109,8 @@ function parseMsg() {
     }
     const msg = msgWidget.text();
     // 被拉黑了 or 被删除了
-    if (msg.includes('好友关系是否正常') || msg.includes('你不是收款方好友')) {
-        var isDel = msg.includes('你不是收款方好友');
+    if (msg.includes('好友关系是否正常') || msg.includes('你不是收款方好友') || msg.includes('无法完成交易')) {
+        var isDel = msg.includes('你不是收款方好友') || msg.includes('无法完成交易');
         state = isDel ? 'del' : 'blacklist';
         sleep(1000);
         // 退出到聊天页面
@@ -191,35 +191,31 @@ function checkIsTop() {
 }
 function startCheckFriends() {
     while (true) {
+        var isEnd = checkIsEnd();
         var friends = getOneScreenFriendList();
         var firstFriend = friends[0];
         var lastFriend = friends[friends.length - 1];
-        for (var i = 0; i < friends.length - 1; i++) {
+        var count = friends.length - (isEnd ? 0 : 1);
+        for (var i = 0; i < count; i++) {
             var item = friends[i];
             var name = item.text();
-            if (allFriendsName.indexOf(name) >= 0 || skipCheckNameList.indexOf(name) >= 0) {
+            if (processFriendsName.indexOf(name) >= 0 || skipCheckNameList.indexOf(name) >= 0) {
                 continue;
             }
             checkFriendItem(friends[i]);
-            sleep(1500);
-            allFriendsName.push(name);
             processFriendsName.push(name);
             if (ENABLE_STORAGE === 'true') {
                 var db = storages.create(DB_NAME);
                 db.put(CHECK_KEY, processFriendsName);
             }
+            sleep(1500);
         }
-        if (checkIsEnd()) {
+        if (isEnd) {
             break;
         }
-        swipe(lastFriend.bounds().centerX(), lastFriend.bounds().centerY() * 0.8, firstFriend.bounds().centerX(), 0, 1000);
+        swipe(lastFriend.bounds().centerX(), lastFriend.bounds().centerY() * 0.6, firstFriend.bounds().centerX(), firstFriend.bounds().centerY() * 0.4, 1000);
+        sleep(1500);
     }
-    allFriendsName.forEach((item) => {
-        var s = allFriendsName.filter((i) => i === item);
-        if (s.length > 1) {
-            console.log(item);
-        }
-    });
 }
 function parsePassCheckNames() {
     if (SKIP_CHECK_NAMES) {
@@ -234,7 +230,7 @@ function parsePassCheckNames() {
         var data = db.get(CHECK_KEY, []);
         data.forEach((item) => {
             if (item) {
-                skipCheckNameList.push(item);
+                processFriendsName.push(item);
             }
         });
     }
